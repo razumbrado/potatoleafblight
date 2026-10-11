@@ -3,7 +3,7 @@ import { AlertCircle, ChevronDown, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 const fieldBase =
-  'h-11 w-full rounded-xl border bg-surface px-3.5 text-sm text-ink placeholder:text-ink-faint transition-colors duration-200 ' +
+  'h-11 w-full min-w-0 max-w-full rounded-xl border bg-surface px-3.5 text-base text-ink sm:text-sm placeholder:text-ink-faint transition-colors duration-200 ' +
   'focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60';
 
 interface FieldShellProps {
@@ -17,7 +17,7 @@ interface FieldShellProps {
 
 function FieldShell({ id, label, error, hint, children, className }: FieldShellProps) {
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('w-full min-w-0', className)}>
       {label && (
         <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-ink">
           {label}
