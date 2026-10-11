@@ -147,6 +147,11 @@
 .recharts-rectangle {
   outline: none;
 }
+/* Charts fill most of a phone screen; always let a vertical swipe on them scroll the page. */
+.recharts-wrapper,
+.recharts-surface {
+  touch-action: pan-y;
+}
 .recharts-text {
   fill: rgb(var(--ink-muted));
 }

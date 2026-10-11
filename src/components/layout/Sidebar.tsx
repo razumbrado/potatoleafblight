@@ -80,13 +80,16 @@ export function Sidebar({ collapsed, onToggleCollapse, onNavigate, onClose }: Si
                     >
                       {({ isActive }) => (
                         <>
-                          {isActive && (
-                            <motion.span
-                              layoutId={onClose ? 'nav-active-mobile' : 'nav-active'}
-                              className="absolute inset-0 rounded-xl bg-white/[0.12] ring-1 ring-inset ring-white/10"
-                              transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-                            />
-                          )}
+                          {isActive &&
+                            (onClose ? (
+                              <span className="absolute inset-0 rounded-xl bg-white/[0.12] ring-1 ring-inset ring-white/10" />
+                            ) : (
+                              <motion.span
+                                layoutId="nav-active"
+                                className="absolute inset-0 rounded-xl bg-white/[0.12] ring-1 ring-inset ring-white/10"
+                                transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                              />
+                            ))}
                           {isActive && !collapsed && (
                             <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-soft" />
                           )}

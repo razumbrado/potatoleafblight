@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 import { PageTransition } from '@/components/common/PageTransition';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
@@ -36,10 +35,15 @@ export function AppLayout() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setDrawerOpen(false);
     };
+    // The drawer only exists below the lg breakpoint; never keep the page locked on a wider screen.
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const onDesktop = () => desktop.matches && setDrawerOpen(false);
     document.addEventListener('keydown', onKey);
+    desktop.addEventListener('change', onDesktop);
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKey);
+      desktop.removeEventListener('change', onDesktop);
       document.body.style.overflow = '';
     };
   }, [drawerOpen]);
@@ -67,33 +71,35 @@ export function AppLayout() {
         <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} />
       </aside>
 
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <div className="no-print fixed inset-0 z-50 lg:hidden">
-            <motion.div
-              className="absolute inset-0 bg-forest/60 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setDrawerOpen(false)}
-              aria-hidden
-            />
-            <motion.aside
-              className="absolute inset-y-0 left-0 w-[86%] max-w-[300px] shadow-lift"
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 380, damping: 38 }}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Navigation"
-            >
-              <Sidebar collapsed={false} onNavigate={() => setDrawerOpen(false)} onClose={() => setDrawerOpen(false)} />
-            </motion.aside>
-          </div>
+      {/* Mobile drawer. Always mounted and driven by CSS, so a closed drawer can never be left
+          behind as an invisible layer that swallows taps. */}
+      <div
+        className={cn(
+          'no-print fixed inset-0 z-50 lg:hidden',
+          drawerOpen ? 'visible' : 'pointer-events-none invisible [transition:visibility_0s_linear_300ms]',
         )}
-      </AnimatePresence>
+        aria-hidden={!drawerOpen}
+      >
+        <div
+          className={cn(
+            'absolute inset-0 bg-forest/60 backdrop-blur-sm transition-opacity duration-300',
+            drawerOpen ? 'opacity-100' : 'opacity-0',
+          )}
+          onClick={() => setDrawerOpen(false)}
+          aria-hidden
+        />
+        <aside
+          className={cn(
+            'absolute inset-y-0 left-0 w-[86%] max-w-[300px] shadow-lift transition-transform duration-300 ease-out',
+            drawerOpen ? 'translate-x-0' : '-translate-x-full',
+          )}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation"
+        >
+          <Sidebar collapsed={false} onNavigate={() => setDrawerOpen(false)} onClose={() => setDrawerOpen(false)} />
+        </aside>
+      </div>
 
       <div className={cn('flex min-h-screen min-w-0 flex-col transition-[padding] duration-300 ease-out', collapsed ? 'lg:pl-20' : 'lg:pl-[272px]', 'print:!pl-0')}>
         <Topbar onOpenMenu={() => setDrawerOpen(true)} />
