@@ -18,6 +18,14 @@ export function UploadZone({ onFile, onOpenCamera, onReject }: UploadZoneProps) 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const dragDepth = useRef(0);
+  // Phones and tablets cannot drag files into a page, so they get upload/camera wording instead.
+  const [touchDevice] = useState(() => {
+    try {
+      return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    } catch {
+      return false;
+    }
+  });
 
   const browse = () => inputRef.current?.click();
 
@@ -48,7 +56,7 @@ export function UploadZone({ onFile, onOpenCamera, onReject }: UploadZoneProps) 
     <motion.div
       role="button"
       tabIndex={0}
-      aria-label="Upload a potato leaf image. Drag and drop, or press Enter to browse."
+      aria-label={touchDevice ? 'Upload a potato leaf image.' : 'Upload a potato leaf image. Drag and drop, or press Enter to browse.'}
       onKeyDown={handleKey}
       onDragEnter={(event) => {
         event.preventDefault();
@@ -92,10 +100,12 @@ export function UploadZone({ onFile, onOpenCamera, onReject }: UploadZoneProps) 
       </motion.div>
 
       <h2 className="mt-6 text-xl font-extrabold text-ink sm:text-2xl">
-        {dragging ? 'Drop the image to upload' : 'Drag & drop a potato leaf image'}
+        {dragging ? 'Drop the image to upload' : touchDevice ? 'Upload a potato leaf image' : 'Drag & drop a potato leaf image'}
       </h2>
       <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
-        or choose a photo from your device. JPG, JPEG, PNG, or WEBP — up to 10 MB.
+        {touchDevice
+          ? 'Choose a photo from your gallery or take one with the camera. JPG, JPEG, PNG, or WEBP — up to 10 MB.'
+          : 'or choose a photo from your device. JPG, JPEG, PNG, or WEBP — up to 10 MB.'}
       </p>
 
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">

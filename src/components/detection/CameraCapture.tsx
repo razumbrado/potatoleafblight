@@ -112,10 +112,21 @@ export function CameraCapture({ open, onClose, onCapture }: CameraCaptureProps) 
       setPhase('error');
       return;
     }
+    // The preview uses object-cover, so only the centre of the camera frame is visible in the box.
+    // Capture exactly that visible region – what the user framed is what gets analyzed.
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    const boxRatio = video.clientWidth > 0 && video.clientHeight > 0 ? video.clientWidth / video.clientHeight : vw / vh;
+    let sw = vw;
+    let sh = vh;
+    if (vw / vh > boxRatio) sw = Math.round(vh * boxRatio);
+    else sh = Math.round(vw / boxRatio);
+    const sx = Math.round((vw - sw) / 2);
+    const sy = Math.round((vh - sh) / 2);
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d')?.drawImage(video, 0, 0);
+    canvas.width = sw;
+    canvas.height = sh;
+    canvas.getContext('2d')?.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
     canvas.toBlob(
       (blob) => {
         if (!blob) {
