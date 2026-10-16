@@ -9,6 +9,8 @@ export interface ReportData {
   earlyBlightProbability: number;
   lateBlightProbability: number;
   dateIso: string;
+  /** Which model produced the result, e.g. "Random Forest · RF-20261015-101500". */
+  modelLabel: string;
 }
 
 const FONT = '"Plus Jakarta Sans Variable", "Plus Jakarta Sans", Inter, system-ui, sans-serif';
@@ -83,7 +85,10 @@ export async function renderReportPng(data: ReportData): Promise<Blob> {
   ctx.textAlign = 'right';
   ctx.fillStyle = '#D8F3DC';
   ctx.font = `500 16px ${FONT}`;
-  ctx.fillText(formatDateTime(data.dateIso), W - 48, 56);
+  ctx.fillText(formatDateTime(data.dateIso), W - 48, 46);
+  ctx.fillStyle = '#B7DCC7';
+  ctx.font = `500 14px ${FONT}`;
+  ctx.fillText(data.modelLabel, W - 48, 74);
   ctx.textAlign = 'left';
 
   // Image (cover fit)
@@ -127,10 +132,9 @@ export async function renderReportPng(data: ReportData): Promise<Blob> {
   ctx.font = `800 44px ${FONT}`;
   ctx.fillText(formatPercent(data.confidence), px, cy + 212);
 
-  const bars: [string, number, string][] = [
-    ['Early Blight', data.earlyBlightProbability, '#B8790F'],
-    ['Late Blight', data.lateBlightProbability, '#1F7A52'],
-  ];
+  // Only the predicted class is shown, in green.
+  const predictedProbability = data.predictedDisease === 'Early Blight' ? data.earlyBlightProbability : data.lateBlightProbability;
+  const bars: [string, number, string][] = [[data.predictedDisease, predictedProbability, '#1F7A52']];
   const barWidth = cw - 80;
   bars.forEach(([label, value, color], index) => {
     const by = cy + 280 + index * 86;

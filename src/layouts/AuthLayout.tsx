@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 
 const highlights = [
-  { icon: ScanLine, title: 'Real model inference', text: 'Your trained Teachable Machine model runs right in the browser.' },
+  { icon: ScanLine, title: 'Real model inference', text: 'A trained Random Forest classifies every image you analyze.' },
   { icon: CloudCog, title: 'Private cloud history', text: 'Saved scans and images are protected by row-level security.' },
   { icon: BarChart3, title: 'Live analytics', text: 'Charts are calculated from your own saved scan records.' },
 ];

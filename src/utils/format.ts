@@ -64,6 +64,15 @@ export function getErrorMessage(error: unknown, fallback = 'Something went wrong
   return fallback;
 }
 
+/**
+ * Describes which model produced a saved scan. Rows saved before the Random Forest migration
+ * have no model_version and are labelled as legacy results, never as Random Forest output.
+ */
+export function describeScanModel(scan: { model_name?: string | null; model_version?: string | null }) {
+  if (!scan.model_version) return { legacy: true, label: 'Legacy model (Teachable Machine)' };
+  return { legacy: false, label: `${scan.model_name ?? 'Random Forest'} · ${scan.model_version}` };
+}
+
 /** yyyy-mm-dd in local time, for <input type="date"> values and day bucketing. */
 export function toLocalDateKey(date: Date): string {
   const y = date.getFullYear();

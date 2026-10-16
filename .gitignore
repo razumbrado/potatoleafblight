@@ -5,3 +5,18 @@ dist
 *.log
 .DS_Store
 scripts/.output
+
+# Python backend
+backend/.venv/
+backend/.env
+__pycache__/
+*.pyc
+backend/models/.*.tmp
+# Pretrained CNN weights are downloaded automatically by torchvision on first use.
+backend/models/torch/
+# Dataset images are large; keep them out of git (the folder layout is documented in backend/README.md).
+backend/dataset/**/*.jpg
+backend/dataset/**/*.jpeg
+backend/dataset/**/*.png
+backend/dataset/**/*.webp
+backend/dataset/**/*.bmp

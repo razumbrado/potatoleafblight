@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, History, Info, ScanLine, Settings, type LucideIcon } from 'lucide-react';
+import { BarChart3, BookOpen, Gauge, History, Info, ScanLine, Settings, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   to: string;
@@ -13,6 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/detect', label: 'Detection', icon: ScanLine, group: 'workspace' },
   { to: '/history', label: 'Scan History', icon: History, protected: true, group: 'workspace' },
   { to: '/analytics', label: 'Analytics', icon: BarChart3, protected: true, group: 'workspace' },
+  { to: '/model-evaluation', label: 'Model Evaluation', icon: Gauge, group: 'workspace' },
   { to: '/diseases', label: 'Disease Library', icon: BookOpen, group: 'learn' },
   { to: '/about', label: 'About', icon: Info, group: 'learn' },
   { to: '/settings', label: 'Settings', icon: Settings, protected: true, group: 'account' },
@@ -30,6 +31,7 @@ export const ROUTE_TITLES: Record<string, string> = {
   results: 'Classification Result',
   history: 'Scan History',
   analytics: 'Analytics',
+  'model-evaluation': 'Model Evaluation',
   diseases: 'Disease Library',
   about: 'About',
   settings: 'Settings',

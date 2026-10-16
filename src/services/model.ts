@@ -1,98 +1,31 @@
-import { METADATA_URL, MODEL_URL } from '@/lib/constants';
-import type { ClassificationResult, ClassProbability, Disease, ModelInfo } from '@/types';
+import { api } from '@/services/api';
+import type { ClassificationResult, Disease } from '@/types';
 
-/** Minimal shape of the object returned by tmImage.load(). */
-interface TeachableMachineModel {
-  getTotalClasses(): number;
-  getClassLabels(): string[];
-  predict(image: HTMLImageElement | HTMLCanvasElement, flipped?: boolean): Promise<ClassProbability[]>;
-}
-
-let modelPromise: Promise<{ model: TeachableMachineModel; info: ModelInfo }> | null = null;
-
-const normalise = (label: string) => label.trim().toLowerCase().replace(/[\s_-]+/g, ' ');
-
-async function fetchMetadata(): Promise<Partial<ModelInfo>> {
-  const response = await fetch(METADATA_URL);
-  if (!response.ok) throw new Error(`Could not load model metadata (HTTP ${response.status}).`);
-  return (await response.json()) as Partial<ModelInfo>;
-}
-
-async function loadInternal() {
-  const started = performance.now();
-
-  // Loaded lazily so TensorFlow.js is only downloaded when the detection workspace needs it.
-  const [tmModule, tf, metadata] = await Promise.all([
-    import('@teachablemachine/image'),
-    import('@tensorflow/tfjs'),
-    fetchMetadata(),
-  ]);
-  // The library is published as CommonJS; depending on the bundler it may sit under `default`.
-  const tmImage = ('load' in tmModule ? tmModule : (tmModule as { default: unknown }).default) as {
-    load(modelUrl: string, metadataUrl: string): Promise<TeachableMachineModel>;
-  };
-
-  await tf.ready();
-  const model = await tmImage.load(MODEL_URL, METADATA_URL);
-
-  const labels = model.getClassLabels();
-  const known = labels.map(normalise);
-  if (!known.includes('early blight') || !known.includes('late blight')) {
-    throw new Error(
-      `The model in public/model has unexpected classes (${labels.join(', ')}). BlightVision expects "Early Blight" and "Late Blight".`,
-    );
-  }
-
-  const info: ModelInfo = {
-    labels,
-    imageSize: metadata.imageSize ?? 224,
-    tfjsVersion: metadata.tfjsVersion,
-    tmVersion: metadata.tmVersion,
-    packageName: metadata.packageName,
-    packageVersion: metadata.packageVersion,
-    modelName: metadata.modelName,
-    timeStamp: metadata.timeStamp,
-    backend: tf.getBackend(),
-    loadTimeMs: Math.round(performance.now() - started),
-  };
-  return { model, info };
-}
-
-/** Loads the Teachable Machine model once; concurrent and repeat calls share the same promise. */
-export function loadModel() {
-  if (!modelPromise) {
-    modelPromise = loadInternal().catch((error) => {
-      modelPromise = null; // allow retry
-      throw error;
-    });
-  }
-  return modelPromise;
-}
+const isProbability = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
 
 /**
- * Runs the real model on an image element and returns its unmodified output.
- * No values are invented, rounded, or adjusted here.
+ * Sends the image to the Python backend, where the trained Random Forest classifies it,
+ * and returns the backend's output unchanged. No values are invented, rounded, or adjusted here.
  */
-export async function classifyImage(image: HTMLImageElement | HTMLCanvasElement): Promise<ClassificationResult> {
-  const { model } = await loadModel();
-  const predictions = await model.predict(image);
+export async function classifyImage(file: File): Promise<ClassificationResult> {
+  const response = await api.predict(file);
 
-  const find = (label: string) => predictions.find((p) => normalise(p.className) === label);
-  const early = find('early blight');
-  const late = find('late blight');
-  if (!early || !late) throw new Error('The model returned an unexpected set of classes.');
-  if (!Number.isFinite(early.probability) || !Number.isFinite(late.probability)) {
-    throw new Error('The model returned an invalid probability. Please try another image.');
+  const early = response.probabilities?.['Early Blight'];
+  const late = response.probabilities?.['Late Blight'];
+  if (!isProbability(early) || !isProbability(late) || !isProbability(response.confidence)) {
+    throw new Error('The classification server returned an invalid probability. Please try another image.');
+  }
+  if (response.predicted_class !== 'Early Blight' && response.predicted_class !== 'Late Blight') {
+    throw new Error(`The classification server returned an unexpected class (${response.predicted_class}).`);
   }
 
-  const predictedDisease: Disease = early.probability >= late.probability ? 'Early Blight' : 'Late Blight';
-
   return {
-    predictedDisease,
-    confidence: Math.max(early.probability, late.probability),
-    earlyBlightProbability: early.probability,
-    lateBlightProbability: late.probability,
-    raw: predictions.map((p) => ({ className: p.className, probability: p.probability })),
+    predictedDisease: response.predicted_class as Disease,
+    confidence: response.confidence,
+    earlyBlightProbability: early,
+    lateBlightProbability: late,
+    modelName: response.model,
+    modelVersion: response.model_version,
     analyzedAt: new Date().toISOString(),
   };
 }

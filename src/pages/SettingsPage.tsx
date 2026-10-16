@@ -1,25 +1,23 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Cpu, Database, Download, Info, KeyRound, LogOut, Mail, Moon, Palette, RefreshCw, Save, Sun, Trash2, User, UserCog } from 'lucide-react';
+import { Database, Download, Info, KeyRound, LogOut, Mail, Moon, Palette, Save, Sun, Trash2, User, UserCog } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { PageHeader } from '@/components/common/PageHeader';
-import { ModelStatusCard } from '@/components/detection/ModelStatusCard';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Input, PasswordInput } from '@/components/ui/Input';
 import { useAuth } from '@/contexts/AuthContext';
-import { useModel } from '@/contexts/ModelContext';
 import { useScans } from '@/contexts/ScansContext';
 import { useTheme, type Theme } from '@/contexts/ThemeContext';
-import { APP_NAME, APP_TAGLINE, APP_VERSION, METADATA_URL, MODEL_URL } from '@/lib/constants';
+import { APP_NAME, APP_TAGLINE, APP_VERSION } from '@/lib/constants';
 import { SCAN_BUCKET } from '@/lib/supabase';
 import { newPasswordSchema, PASSWORD_HINT, profileSchema, type NewPasswordValues, type ProfileValues } from '@/lib/validation';
 import { cn } from '@/utils/cn';
 import { exportScansCsv } from '@/utils/csv';
-import { formatDate, formatDateTime, getErrorMessage, getInitials } from '@/utils/format';
+import { formatDate, getErrorMessage, getInitials } from '@/utils/format';
 
 function InfoRow({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -196,42 +194,6 @@ function AppearanceCard() {
   );
 }
 
-function ModelCard() {
-  const { status, info, reload } = useModel();
-  return (
-    <Card>
-      <CardHeader
-        title="AI model"
-        description="Loading status and details of the Teachable Machine model."
-        icon={<Cpu />}
-        action={
-          <Button size="sm" variant="outline" onClick={reload} disabled={status === 'loading'} icon={<RefreshCw className={cn('h-3.5 w-3.5', status === 'loading' && 'animate-spin')} />}>
-            {status === 'ready' ? 'Reload' : status === 'loading' ? 'Loading…' : 'Load model'}
-          </Button>
-        }
-      />
-      <ModelStatusCard className="shadow-none" />
-      <dl className="mt-4 divide-y divide-line">
-        <InfoRow label="Model source" value="Google Teachable Machine (image)" />
-        <InfoRow label="Classes" value={info ? info.labels.join(' · ') : '—'} />
-        <InfoRow label="Input image size" value={info ? `${info.imageSize} × ${info.imageSize} px` : '—'} />
-        <InfoRow label="Inference backend" value={info?.backend ?? '—'} />
-        <InfoRow label="Load time" value={info?.loadTimeMs !== undefined ? `${info.loadTimeMs.toLocaleString()} ms` : '—'} />
-        <InfoRow label="Trained with" value={info?.tmVersion ? `Teachable Machine ${info.tmVersion} · TF.js ${info.tfjsVersion ?? '?'}` : '—'} />
-        <InfoRow label="Exported" value={info?.timeStamp ? formatDateTime(info.timeStamp) : '—'} />
-        <InfoRow
-          label="Model files"
-          value={
-            <span className="font-mono text-xs">
-              {MODEL_URL} · {METADATA_URL}
-            </span>
-          }
-        />
-      </dl>
-    </Card>
-  );
-}
-
 function DataCard() {
   const { scans, loading, clearAll } = useScans();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -310,8 +272,8 @@ function ApplicationCard() {
         <InfoRow label="Application" value={`${APP_NAME} – ${APP_TAGLINE}`} />
         <InfoRow label="Version" value={APP_VERSION} />
         <InfoRow label="Interface" value="React · TypeScript · Tailwind CSS" />
-        <InfoRow label="AI runtime" value="TensorFlow.js · @teachablemachine/image" />
-        <InfoRow label="Backend" value="Supabase Auth · PostgreSQL · Storage" />
+        <InfoRow label="AI runtime" value="Python · FastAPI · scikit-learn Random Forest" />
+        <InfoRow label="Data backend" value="Supabase Auth · PostgreSQL · Storage" />
       </dl>
     </Card>
   );
@@ -320,16 +282,15 @@ function ApplicationCard() {
 export function SettingsPage() {
   return (
     <div>
-      <PageHeader eyebrow="Preferences" title="Settings" description="Manage your profile, account, appearance, AI model, and saved data." />
+      <PageHeader eyebrow="Preferences" title="Settings" description="Manage your profile, account, appearance, and saved data." />
       <div className="grid items-start gap-5 xl:grid-cols-2">
         <div className="space-y-5">
           <ProfileCard />
           <AccountCard />
-          <AppearanceCard />
         </div>
         <div className="space-y-5">
-          <ModelCard />
           <DataCard />
+          <AppearanceCard />
           <ApplicationCard />
         </div>
       </div>

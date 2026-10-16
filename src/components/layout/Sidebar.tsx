@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ChevronsLeft, ChevronsRight, Lock, LogIn, X } from 'lucide-react';
 import { Logo, LogoMark } from '@/components/common/Logo';
 import { useAuth } from '@/contexts/AuthContext';
-import { useModel } from '@/contexts/ModelContext';
 import { cn } from '@/utils/cn';
 import { getInitials } from '@/utils/format';
 import { NAV_GROUPS, NAV_ITEMS } from './navigation';
@@ -17,23 +16,8 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-const modelLabels = {
-  idle: 'Model standing by',
-  loading: 'Loading AI model…',
-  ready: 'AI model ready',
-  error: 'Model failed to load',
-} as const;
-
-const modelDots = {
-  idle: 'bg-white/40',
-  loading: 'bg-amber-300 animate-pulse',
-  ready: 'bg-soft',
-  error: 'bg-red-400',
-} as const;
-
 export function Sidebar({ collapsed, onToggleCollapse, onNavigate, onClose }: SidebarProps) {
   const { user, displayName } = useAuth();
-  const { status } = useModel();
 
   return (
     <div className="flex h-full flex-col bg-sidebar-gradient text-white">
@@ -112,16 +96,6 @@ export function Sidebar({ collapsed, onToggleCollapse, onNavigate, onClose }: Si
       </nav>
 
       <div className={cn('shrink-0 space-y-3 border-t border-white/10 py-4', collapsed ? 'px-3' : 'px-4')}>
-        <div
-          className={cn('flex items-center rounded-xl bg-white/[0.06] text-xs font-medium text-white/75', collapsed ? 'h-10 justify-center' : 'gap-2.5 px-3 py-2.5')}
-          title={modelLabels[status]}
-          role="status"
-        >
-          <span className={cn('h-2 w-2 shrink-0 rounded-full', modelDots[status])} />
-          {!collapsed && <span className="truncate">{modelLabels[status]}</span>}
-          {collapsed && <span className="sr-only">{modelLabels[status]}</span>}
-        </div>
-
         {user ? (
           <Link
             to="/settings"

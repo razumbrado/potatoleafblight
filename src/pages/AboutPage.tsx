@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { AlertTriangle, BrainCircuit, Crop, Cpu, Database, GraduationCap, Layers, Lock, Microscope, Sprout, Target, Tractor, Users } from 'lucide-react';
 import { Notice } from '@/components/common/Notice';
 import { LogoMark } from '@/components/common/Logo';
@@ -39,10 +40,10 @@ function Bullets({ items }: { items: ReactNode[] }) {
 }
 
 const pipeline = [
-  { icon: Crop, title: 'Prepare', text: 'Your image is centre-cropped to a square and resized to 224 × 224 pixels.' },
-  { icon: Layers, title: 'Extract', text: 'A MobileNet-based network turns the pixels into a compact set of visual features.' },
-  { icon: BrainCircuit, title: 'Classify', text: 'A small trained classification head scores those features for each class.' },
-  { icon: Target, title: 'Report', text: 'A softmax layer converts the scores to probabilities that add up to 100%.' },
+  { icon: Crop, title: 'Prepare', text: 'The Python backend converts your image to RGB and resizes it to a fixed square size.' },
+  { icon: Layers, title: 'Extract', text: 'A frozen, ImageNet-pretrained CNN plus colour, HOG, texture, and lesion descriptors turn the image into one numeric feature vector.' },
+  { icon: BrainCircuit, title: 'Classify', text: 'Hundreds of decision trees in a trained Random Forest each vote on the class.' },
+  { icon: Target, title: 'Report', text: 'predict_proba() averages the trees’ votes into probabilities that add up to 100%.' },
 ];
 
 const users = [
@@ -71,8 +72,8 @@ export function AboutPage() {
             <h2 className="text-2xl font-extrabold sm:text-3xl">BlightVision overview</h2>
             <p className="mt-3 text-sm leading-relaxed text-white/80 sm:text-base">
               BlightVision is a web application for potato leaf blight classification. You upload or capture a photo of a
-              potato leaf, and a trained Google Teachable Machine image model — running entirely in your browser — reports
-              how strongly the image resembles Early Blight or Late Blight. Signed-in users can save results to a private
+              potato leaf, and a Random Forest classifier — trained with scikit-learn and served by a Python FastAPI
+              backend — reports how strongly the image resembles Early Blight or Late Blight. Signed-in users can save results to a private
               cloud history and review them through an analytics dashboard.
             </p>
           </div>
@@ -121,28 +122,35 @@ export function AboutPage() {
             ))}
           </ol>
           <p className="mt-5 text-sm leading-relaxed text-ink-muted">
-            Because the final layer is a softmax over two classes, the two probabilities always sum to 100%. A high
-            percentage means the image resembles that class more than the other — it is not a measure of how likely the
-            plant is to have the disease.
+            Because the probabilities are the share of tree votes for each of two classes, they always sum to 100%. A
+            high percentage means most trees found the image closer to that class — it is not a guarantee that the
+            prediction is correct, nor a measure of how likely the plant is to have the disease.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+            See how the model performed on held-out test images on the{' '}
+            <Link to="/model-evaluation" className="font-semibold text-accent hover:underline">
+              Model Evaluation
+            </Link>{' '}
+            page.
           </p>
         </Card>
       </Reveal>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Section icon={<BrainCircuit />} title="Teachable Machine integration">
+        <Section icon={<BrainCircuit />} title="Random Forest integration">
           <p>
-            The classifier was trained with Google Teachable Machine and exported in TensorFlow.js format (
-            <code className="font-semibold text-ink">model.json</code>, <code className="font-semibold text-ink">metadata.json</code>,{' '}
-            <code className="font-semibold text-ink">weights.bin</code>). BlightVision loads it with the{' '}
-            <code className="font-semibold text-ink">@teachablemachine/image</code> library and calls{' '}
-            <code className="font-semibold text-ink">model.predict()</code> on your image.
+            The classifier is a scikit-learn <code className="font-semibold text-ink">RandomForestClassifier</code> trained by{' '}
+            <code className="font-semibold text-ink">backend/train_model.py</code> on labelled potato leaf images and saved with
+            Joblib. The FastAPI backend loads the saved model once and calls{' '}
+            <code className="font-semibold text-ink">predict_proba()</code> on the features extracted from your image — the model is
+            never retrained when you analyze a photo.
           </p>
           <dl className="grid grid-cols-2 gap-3 pt-1">
             {[
-              ['Framework', 'TensorFlow.js'],
-              ['Input size', `${info?.imageSize ?? 224} × ${info?.imageSize ?? 224} px`],
-              ['Classes', String(info?.labels.length ?? 2)],
-              ['Runs on', info?.backend ? `Your device (${info.backend})` : 'Your device'],
+              ['Framework', 'scikit-learn'],
+              ['Decision trees', info ? info.n_estimators.toLocaleString() : '—'],
+              ['Features per image', info ? info.feature_count.toLocaleString() : '—'],
+              ['Runs on', 'Python FastAPI server'],
             ].map(([term, detail]) => (
               <div key={term} className="rounded-xl bg-subtle p-3">
                 <dt className="text-xs font-semibold text-ink-faint">{term}</dt>
@@ -192,7 +200,7 @@ export function AboutPage() {
         <Section icon={<AlertTriangle />} title="System limitations">
           <Bullets
             items={[
-              'The model knows only two classes. It has no “healthy” class and no “not a potato leaf” class.',
+              'The Random Forest was trained on two classes only. It has no “healthy” class and no “not a potato leaf” class.',
               'Any image — a healthy leaf, another crop, or an unrelated photo — still receives an Early Blight or Late Blight label.',
               'A high confidence value does not confirm disease, and a low one does not prove an image is invalid.',
               'Accuracy depends on the training images. Lighting, blur, backgrounds, leaf age, and other diseases can all mislead it.',
@@ -204,7 +212,7 @@ export function AboutPage() {
         <Section icon={<Lock />} title="Data privacy information">
           <Bullets
             items={[
-              'Analysis happens on your device. Images are not uploaded anywhere when you only analyze.',
+              'To analyze an image, it is sent to the BlightVision Python backend, classified in memory, and not stored there.',
               'An image is uploaded only when you are signed in and choose “Save Result”.',
               <>Saved images go to a private Supabase Storage bucket; scan records go to a PostgreSQL table.</>,
               'Row-level security policies restrict every record and image to the account that created it.',

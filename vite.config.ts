@@ -9,19 +9,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  optimizeDeps: {
-    include: ['@tensorflow/tfjs', '@teachablemachine/image'],
-  },
   build: {
-    // TensorFlow.js is large but only downloaded when the detection workspace opens.
-    chunkSizeWarningLimit: 2100,
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
         manualChunks: {
-          tensorflow: ['@tensorflow/tfjs', '@teachablemachine/image'],
           charts: ['recharts'],
         },
       },

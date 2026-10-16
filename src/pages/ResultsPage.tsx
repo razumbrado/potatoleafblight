@@ -81,6 +81,7 @@ export function ResultsPage() {
         earlyBlightProbability: result.earlyBlightProbability,
         lateBlightProbability: result.lateBlightProbability,
         dateIso: result.analyzedAt,
+        modelLabel: `${result.modelName} · ${result.modelVersion}`,
       });
       const slug = result.predictedDisease.toLowerCase().replace(/\s+/g, '-');
       downloadBlob(blob, `blightvision-${slug}-${toLocalDateKey(new Date(result.analyzedAt))}.png`);
@@ -97,7 +98,7 @@ export function ResultsPage() {
       <PageHeader
         eyebrow="Classification report"
         title="Classification Result"
-        description="Probabilities below are the direct outputs of the trained model for this image."
+        description="Probabilities below are the direct predict_proba() outputs of the trained Random Forest for this image."
         actions={
           <>
             <Button variant="outline" onClick={handleAnother} icon={<ScanLine className="h-4 w-4" />}>
@@ -124,6 +125,7 @@ export function ResultsPage() {
         lateBlightProbability={result.lateBlightProbability}
         dateIso={result.analyzedAt}
         statusLabel={savedScanId ? 'Saved to your history' : undefined}
+        modelLabel={`${result.modelName} · ${result.modelVersion}`}
       />
 
       <div className="no-print mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4">

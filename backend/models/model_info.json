@@ -1,0 +1,117 @@
+{
+  "algorithm": "Random Forest",
+  "implementation": "scikit-learn 1.6.1 RandomForestClassifier",
+  "model_version": "RF-20261016-043043",
+  "training_date": "2026-10-16T04:30:43.337763+00:00",
+  "classes": [
+    "Early Blight",
+    "Late Blight"
+  ],
+  "dataset_size": 2000,
+  "train_test_split": {
+    "train": 0.8,
+    "test": 0.2,
+    "actual_train_ratio": 0.8,
+    "actual_test_ratio": 0.2,
+    "strategy": "StratifiedGroupKFold (5 folds, one held out as test) \u2013 stratified by class and source, duplicate-aware",
+    "random_state": 42
+  },
+  "n_estimators": 200,
+  "probability_calibration": {
+    "method": "sigmoid (Platt scaling)",
+    "fitted_on": "3-fold group-aware cross-validated Random Forest votes on the training split",
+    "purpose": "Makes the reported confidence match how often predictions are actually correct."
+  },
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": 20,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "max_features": 0.05,
+    "class_weight": "balanced",
+    "bootstrap": true,
+    "criterion": "gini",
+    "random_state": 42
+  },
+  "feature_extraction": [
+    "Deep features from a frozen, ImageNet-pretrained EfficientNet-B0 CNN (1,280 values; classification head removed)",
+    "Colour histograms (HSV + CIELAB, 32 bins per channel)",
+    "Colour moments (mean, standard deviation, skewness per HSV / CIELAB channel)",
+    "Histogram of Oriented Gradients (HOG)",
+    "Local Binary Patterns (uniform, two radii)",
+    "Grey-Level Co-occurrence Matrix (GLCM) texture statistics",
+    "Lesion features (colour of diseased tissue, lesion count, size distribution, circularity, solidity)"
+  ],
+  "feature_count": 1971,
+  "feature_layout": {
+    "cnn_efficientnet_b0": 1280,
+    "color_histograms": 192,
+    "color_moments": 18,
+    "hog": 324,
+    "lbp": 28,
+    "glcm": 12,
+    "lesion": 117
+  },
+  "feature_config": {
+    "version": 4,
+    "cnn": {
+      "backbone": "efficientnet_b0",
+      "input_size": 224,
+      "dim": 1280
+    },
+    "handcrafted": true,
+    "max_side": 384,
+    "image_size": 128,
+    "color_hist_bins": 32,
+    "hog": {
+      "orientations": 9,
+      "pixels_per_cell": [
+        32,
+        32
+      ],
+      "cells_per_block": [
+        2,
+        2
+      ],
+      "block_norm": "L2-Hys"
+    },
+    "lbp": [
+      {
+        "points": 8,
+        "radius": 1
+      },
+      {
+        "points": 16,
+        "radius": 2
+      }
+    ],
+    "glcm": {
+      "distances": [
+        1,
+        3
+      ],
+      "angles_deg": [
+        0,
+        45,
+        90,
+        135
+      ],
+      "levels": 64
+    },
+    "lesion_features": true
+  },
+  "image_size": 224,
+  "tuned": true,
+  "augmentation": {
+    "copies_per_training_image": 2,
+    "applied_to": "training split only",
+    "transforms": [
+      "random zoom / crop",
+      "90\u00b0 rotations and flips",
+      "brightness / contrast / saturation",
+      "occasional blur",
+      "background replacement with blurred real leaf tissue"
+    ]
+  },
+  "training_seconds": 371.3
+}

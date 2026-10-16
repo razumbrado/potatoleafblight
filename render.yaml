@@ -1,0 +1,17 @@
+# Render Blueprint for the BlightVision Python backend (free web service).
+# Render → New → Blueprint → select this GitHub repository.
+services:
+  - type: web
+    name: blightvision-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      # Allow the Vercel website (any *.vercel.app domain) to call the API.
+      - key: CORS_ORIGIN_REGEX
+        value: https://.*[.]vercel[.]app

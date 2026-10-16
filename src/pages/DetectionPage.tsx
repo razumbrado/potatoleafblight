@@ -1,20 +1,18 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Camera, FileImage, ImagePlus, Lightbulb, RotateCcw, ScanLine, Trash2 } from 'lucide-react';
+import { ArrowRight, Camera, FileImage, ImagePlus, RotateCcw, ScanLine, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Notice } from '@/components/common/Notice';
 import { PageHeader } from '@/components/common/PageHeader';
 import { AnalyzingOverlay } from '@/components/detection/AnalyzingOverlay';
 import { CameraCapture } from '@/components/detection/CameraCapture';
-import { ModelStatusCard } from '@/components/detection/ModelStatusCard';
 import { ACCEPT_ATTRIBUTE, UploadZone } from '@/components/detection/UploadZone';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useDetection } from '@/contexts/DetectionContext';
 import { useModel } from '@/contexts/ModelContext';
 import { MODEL_SCOPE_NOTE } from '@/lib/constants';
-import { CAPTURE_TIPS } from '@/lib/diseases';
 import { formatFileSize, getErrorMessage } from '@/utils/format';
 import { loadImageElement, validateImageFile } from '@/utils/image';
 
@@ -73,8 +71,8 @@ export function DetectionPage() {
     if (!modelReady) {
       const message =
         status === 'error'
-          ? 'The AI model failed to load, so the image cannot be analyzed yet. Retry loading the model.'
-          : 'The AI model is still loading. Analysis will be available in a moment.';
+          ? 'The classification server or its trained model is unavailable, so the image cannot be analyzed yet. Check the backend and retry.'
+          : 'Still connecting to the classification server. Analysis will be available in a moment.';
       setError(message);
       toast.error(message);
       return;
@@ -84,8 +82,7 @@ export function DetectionPage() {
     setAnalyzing(true);
     const started = performance.now();
     try {
-      const image = await loadImageElement(previewUrl);
-      const prediction = await classify(image);
+      const prediction = await classify(file);
       const remaining = MIN_ANALYZING_MS - (performance.now() - started);
       if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
       setResult(prediction);
@@ -104,10 +101,10 @@ export function DetectionPage() {
       <PageHeader
         eyebrow="AI workspace"
         title="Potato Leaf Detection"
-        description="Upload or capture a clear photo of a potato leaf, then run the trained model to classify it as Early Blight or Late Blight."
+        description="Upload or capture a clear photo of a potato leaf, then run the trained Random Forest model to classify it as Early Blight or Late Blight."
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div data-model-status={status}>
         <div className="min-w-0 space-y-5">
           <Card className="p-4 sm:p-5">
             <AnimatePresence mode="wait" initial={false}>
@@ -199,7 +196,7 @@ export function DetectionPage() {
                 <span data-testid="detection-error">{error}</span>
                 {status === 'error' && (
                   <Button size="sm" variant="outline" className="ml-0 mt-3 block" onClick={reload}>
-                    Retry loading the model
+                    Reconnect to the model server
                   </Button>
                 )}
               </Notice>
@@ -211,8 +208,8 @@ export function DetectionPage() {
                   ? 'Add an image to enable analysis.'
                   : !modelReady
                     ? status === 'error'
-                      ? 'The model is unavailable — retry loading it to continue.'
-                      : 'Waiting for the AI model to finish loading…'
+                      ? 'The model server is unavailable or still waking up — retrying automatically…'
+                      : 'Connecting to the Random Forest model server (this can take a minute if it was asleep)…'
                     : result
                       ? 'This image has already been analyzed. You can view the result or run it again.'
                       : 'Ready when you are — nothing is analyzed until you click Analyze Image.'}
@@ -243,39 +240,10 @@ export function DetectionPage() {
             </div>
           </Card>
 
-          <Notice tone="warning" title="Analyze clear potato leaf images only">
+          <Notice tone="warning" title="For potato leaves suspected of Early or Late Blight">
             {MODEL_SCOPE_NOTE}
           </Notice>
         </div>
-
-        <aside className="space-y-5">
-          <ModelStatusCard />
-          <Card>
-            <div className="mb-4 flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
-                <Lightbulb className="h-5 w-5" aria-hidden />
-              </span>
-              <h2 className="text-base font-bold text-ink">Tips for a useful photo</h2>
-            </div>
-            <ul className="space-y-3.5">
-              {CAPTURE_TIPS.slice(0, 4).map((tip, index) => (
-                <li key={tip.title} className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-subtle text-xs font-bold text-accent">
-                    {index + 1}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-ink">{tip.title}</p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-ink-muted">{tip.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <Link to="/diseases#capture-tips" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline">
-              More guidance in the Disease Library
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </Card>
-        </aside>
       </div>
 
       <CameraCapture open={cameraOpen} onClose={() => setCameraOpen(false)} onCapture={(captured) => void acceptFile(captured)} />

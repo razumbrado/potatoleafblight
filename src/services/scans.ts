@@ -59,6 +59,8 @@ export async function saveScan(params: {
       early_blight_probability: result.earlyBlightProbability,
       late_blight_probability: result.lateBlightProbability,
       scanned_at: result.analyzedAt,
+      model_name: result.modelName,
+      model_version: result.modelVersion,
     })
     .select()
     .single();
@@ -66,6 +68,11 @@ export async function saveScan(params: {
   if (insertError || !data) {
     // Compensate: do not leave an image without a record.
     await supabase.storage.from(SCAN_BUCKET).remove([imagePath]);
+    if (insertError && /model_(name|version)/.test(insertError.message)) {
+      throw new Error(
+        'Your Supabase database is missing the model_name / model_version columns. Run supabase/migrations/20261015000000_scan_history_model_version.sql in the Supabase SQL Editor, then save again.',
+      );
+    }
     throw new Error(`Could not save the scan record: ${insertError?.message ?? 'no row returned'}`);
   }
   return data as ScanRecord;

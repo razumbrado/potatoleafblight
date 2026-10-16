@@ -25,12 +25,12 @@ const features = [
   {
     icon: BrainCircuit,
     title: 'AI-Powered Classification',
-    text: 'A trained Google Teachable Machine image model classifies leaf photos as Early Blight or Late Blight.',
+    text: 'A trained scikit-learn Random Forest classifies leaf photos as Early Blight or Late Blight.',
   },
   {
     icon: Zap,
     title: 'Instant Image Analysis',
-    text: 'Inference runs in your browser with TensorFlow.js, so results arrive moments after you click Analyze.',
+    text: 'A Python backend extracts CNN, colour, shape, and texture features and returns class probabilities in moments.',
   },
   {
     icon: History,
@@ -63,19 +63,19 @@ const steps = [
   {
     icon: Cpu,
     title: 'Analyze using the trained AI model',
-    text: 'The image is resized to 224 × 224 and passed through the model on your device.',
+    text: 'A pretrained CNN and colour, shape, and texture descriptors extract features; a trained Random Forest classifies them.',
   },
   {
     icon: FileCheck2,
     title: 'View classification results',
-    text: 'See the predicted disease, the probability for each class, and practical guidance.',
+    text: 'See the predicted disease, its confidence score, and practical guidance.',
   },
 ];
 
 const heroFacts = [
   { value: '2', label: 'disease classes' },
-  { value: '224²', label: 'pixel model input' },
-  { value: '100%', label: 'in-browser inference' },
+  { value: 'Private', label: 'cloud scan history' },
+  { value: 'RF', label: 'random forest classifier' },
 ];
 
 export function LandingPage() {
@@ -103,7 +103,7 @@ export function LandingPage() {
             </h1>
             <p className="mt-5 max-w-[34rem] text-base leading-relaxed text-white/75 sm:text-lg">
               Upload a photo of a potato leaf and BlightVision’s trained image model tells you whether it looks more like
-              Early Blight or Late Blight — with the probability for each, clear disease guidance, and a private history
+              Early Blight or Late Blight — with a confidence score, clear disease guidance, and a private history
               of every scan you save.
             </p>
             <div className="mt-8 flex flex-col gap-3 min-[460px]:flex-row">

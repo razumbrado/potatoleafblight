@@ -33,7 +33,7 @@ export function AnalyzingOverlay({ active }: { active: boolean }) {
             <ScanLine className="h-5 w-5 text-soft" aria-hidden />
             <div className="text-left">
               <p className="text-sm font-bold">Analyzing leaf image…</p>
-              <p className="text-xs text-white/70">Running the trained model in your browser</p>
+              <p className="text-xs text-white/70">Extracting features and running the Random Forest</p>
             </div>
           </motion.div>
         </motion.div>

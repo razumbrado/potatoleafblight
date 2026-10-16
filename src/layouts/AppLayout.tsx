@@ -20,7 +20,7 @@ export function AppLayout() {
     }
   });
 
-  // Warm the model up as soon as someone enters the application shell.
+  // Check the model server as soon as someone enters the application shell.
   useEffect(() => {
     ensureLoaded();
   }, [ensureLoaded]);

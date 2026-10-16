@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Bug, CalendarClock, CheckCircle2, CloudSun, ImageOff, ListChecks, ShieldCheck, Sprout, Stethoscope } from 'lucide-react';
-import { DiseaseBadge } from '@/components/common/DiseaseBadge';
+import { Bug, CalendarClock, CheckCircle2, CloudSun, Cpu, ImageOff, ListChecks, ShieldCheck, Sprout, Stethoscope } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
 import { Notice } from '@/components/common/Notice';
 import { Card } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -23,6 +23,10 @@ export interface ResultReportProps {
   dateIso: string;
   /** Extra line under the date, e.g. "Saved to your history". */
   statusLabel?: string;
+  /** Which model produced the result, e.g. "Random Forest · RF-20261015-101500". */
+  modelLabel: string;
+  /** True for scans saved with the earlier Teachable Machine model. */
+  legacyModel?: boolean;
 }
 
 function InfoList({ title, icon, items }: { title: string; icon: ReactNode; items: string[] }) {
@@ -55,6 +59,8 @@ export function ResultReport({
   lateBlightProbability,
   dateIso,
   statusLabel,
+  modelLabel,
+  legacyModel = false,
 }: ResultReportProps) {
   const info = DISEASE_INFO[predictedDisease];
   const isEarly = predictedDisease === 'Early Blight';
@@ -92,7 +98,10 @@ export function ResultReport({
         <Card className="flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="eyebrow">Model prediction</p>
-            <DiseaseBadge disease={predictedDisease} />
+            <Badge tone="late">
+              <span className="h-1.5 w-1.5 rounded-full bg-late" aria-hidden />
+              {predictedDisease}
+            </Badge>
           </div>
 
           <motion.h2
@@ -108,21 +117,19 @@ export function ResultReport({
             <span className="italic">{info.agent}</span> · {info.agentType}
           </p>
 
-          <div className={cn('mt-6 flex items-end justify-between gap-4 rounded-2xl p-5', isEarly ? 'bg-early-soft' : 'bg-late-soft')}>
+          {/* Only the predicted class is shown, always in the green result style. */}
+          <div className="mt-6 flex items-end justify-between gap-4 rounded-2xl bg-late-soft p-5">
             <div>
-              <p className={cn('text-xs font-semibold uppercase tracking-wider', isEarly ? 'text-early-ink' : 'text-late-ink')}>
-                Prediction confidence
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-late-ink">Prediction confidence</p>
               <p className="tabular mt-1 text-4xl font-extrabold text-ink sm:text-5xl" data-testid="confidence">
                 {formatPercent(confidence)}
               </p>
             </div>
-            <ShieldCheck className={cn('h-10 w-10 shrink-0', isEarly ? 'text-early' : 'text-late')} aria-hidden />
+            <ShieldCheck className="h-10 w-10 shrink-0 text-late" aria-hidden />
           </div>
 
-          <div className="mt-6 space-y-5">
-            <ProbabilityBar label="Early Blight" value={earlyBlightProbability} tone="early" highlighted={isEarly} />
-            <ProbabilityBar label="Late Blight" value={lateBlightProbability} tone="late" highlighted={!isEarly} delay={0.12} />
+          <div className="mt-6">
+            <ProbabilityBar label={predictedDisease} value={isEarly ? earlyBlightProbability : lateBlightProbability} tone="late" />
           </div>
 
           <div className="mt-auto pt-6">
@@ -130,6 +137,10 @@ export function ResultReport({
               <span className="flex items-center gap-2">
                 <CalendarClock className="h-4 w-4 text-ink-faint" aria-hidden />
                 <time dateTime={dateIso}>{formatDateTime(dateIso)}</time>
+              </span>
+              <span className={cn('flex items-center gap-2', legacyModel && 'text-warning')} data-testid="model-label">
+                <Cpu className="h-4 w-4 text-ink-faint" aria-hidden />
+                {modelLabel}
               </span>
               {statusLabel && (
                 <span className="flex items-center gap-2 font-medium text-accent">
@@ -141,6 +152,14 @@ export function ResultReport({
           </div>
         </Card>
       </div>
+
+      {legacyModel && (
+        <Notice tone="warning" title="Legacy result">
+          This scan was saved with BlightVision’s earlier Teachable Machine model, before the switch to the Random Forest
+          classifier. Its probabilities are shown exactly as they were stored, but they are not Random Forest results and
+          are not covered by the current Model Evaluation metrics.
+        </Notice>
+      )}
 
       {lowConfidence && (
         <Notice tone="warning" title="Lower-confidence prediction">

@@ -16,6 +16,8 @@ export function scansToCsv(scans: ScanRecord[]): string {
     'Confidence (%)',
     'Early Blight Probability (%)',
     'Late Blight Probability (%)',
+    'Model',
+    'Model Version',
     'Image Path',
   ];
   const rows = scans.map((scan) => [
@@ -26,6 +28,8 @@ export function scansToCsv(scans: ScanRecord[]): string {
     (scan.confidence * 100).toFixed(2),
     (scan.early_blight_probability * 100).toFixed(2),
     (scan.late_blight_probability * 100).toFixed(2),
+    scan.model_version ? (scan.model_name ?? 'Random Forest') : 'Legacy (Teachable Machine)',
+    scan.model_version ?? '',
     scan.image_path,
   ]);
   return [header, ...rows].map((row) => row.map(escapeCell).join(',')).join('\r\n');

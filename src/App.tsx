@@ -20,6 +20,7 @@ import { SettingsPage } from '@/pages/SettingsPage';
 
 // Recharts is only needed on the dashboard, so it is loaded on demand.
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage').then((module) => ({ default: module.AnalyticsPage })));
+const ModelEvaluationPage = lazy(() => import('@/pages/ModelEvaluationPage').then((module) => ({ default: module.ModelEvaluationPage })));
 
 function PageFallback() {
   return (
@@ -45,6 +46,14 @@ export default function App() {
         {/* Open to visitors */}
         <Route path="/detect" element={<DetectionPage />} />
         <Route path="/results" element={<ResultsPage />} />
+        <Route
+          path="/model-evaluation"
+          element={
+            <Suspense fallback={<PageFallback />}>
+              <ModelEvaluationPage />
+            </Suspense>
+          }
+        />
         <Route path="/diseases" element={<DiseasesPage />} />
         <Route path="/about" element={<AboutPage />} />
 

@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useScans } from '@/contexts/ScansContext';
 import { useSignedUrls } from '@/hooks/useSignedUrls';
-import { getErrorMessage, toLocalDateKey } from '@/utils/format';
+import { describeScanModel, getErrorMessage, toLocalDateKey } from '@/utils/format';
 import { downloadBlob } from '@/utils/image';
 import { renderReportPng } from '@/utils/report';
 
@@ -60,6 +60,7 @@ export function ScanDetailPage() {
   }
 
   const imageUrl = urls[scan.image_path];
+  const model = describeScanModel(scan);
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -87,6 +88,7 @@ export function ScanDetailPage() {
         earlyBlightProbability: scan.early_blight_probability,
         lateBlightProbability: scan.late_blight_probability,
         dateIso: scan.scanned_at,
+        modelLabel: model.label,
       });
       const slug = scan.predicted_disease.toLowerCase().replace(/\s+/g, '-');
       downloadBlob(blob, `blightvision-${slug}-${toLocalDateKey(new Date(scan.scanned_at))}.png`);
@@ -134,6 +136,8 @@ export function ScanDetailPage() {
         lateBlightProbability={scan.late_blight_probability}
         dateIso={scan.scanned_at}
         statusLabel="Saved to your history"
+        modelLabel={model.label}
+        legacyModel={model.legacy}
       />
 
       <ConfirmDialog

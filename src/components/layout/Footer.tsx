@@ -10,6 +10,7 @@ const columns = [
       { to: '/detect', label: 'Start Detection' },
       { to: '/history', label: 'Scan History' },
       { to: '/analytics', label: 'Analytics Dashboard' },
+      { to: '/model-evaluation', label: 'Model Evaluation' },
     ],
   },
   {
@@ -38,8 +39,9 @@ export function Footer() {
           <div>
             <Logo tone="onDark" showTagline />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/65">
-              BlightVision is a potato leaf blight classification system. It uses a Google Teachable Machine image model,
-              running in your browser with TensorFlow.js, to classify leaf photos as Early Blight or Late Blight.
+              BlightVision is a potato leaf blight classification system. A scikit-learn Random Forest, served by a Python
+              FastAPI backend, classifies leaf photos as Early Blight or Late Blight from features extracted by a
+              pretrained CNN and colour, shape, and texture descriptors.
             </p>
           </div>
           {columns.map((column) => (

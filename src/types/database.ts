@@ -30,6 +30,8 @@ export type Database = {
           early_blight_probability: number;
           late_blight_probability: number;
           scanned_at: string;
+          model_name: string | null;
+          model_version: string | null;
         };
         Insert: {
           id?: string;
@@ -40,6 +42,8 @@ export type Database = {
           early_blight_probability: number;
           late_blight_probability: number;
           scanned_at?: string;
+          model_name?: string | null;
+          model_version?: string | null;
         };
         Update: {
           id?: string;
@@ -50,6 +54,8 @@ export type Database = {
           early_blight_probability?: number;
           late_blight_probability?: number;
           scanned_at?: string;
+          model_name?: string | null;
+          model_version?: string | null;
         };
         Relationships: [];
       };

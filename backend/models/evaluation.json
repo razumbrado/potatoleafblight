@@ -1,0 +1,200 @@
+{
+  "model_version": "RF-20261016-043043",
+  "generated_at": "2026-10-16T04:30:43.337763+00:00",
+  "positive_class": "Late Blight",
+  "classes": [
+    "Early Blight",
+    "Late Blight"
+  ],
+  "training_accuracy": 0.999375,
+  "testing_accuracy": 0.965,
+  "precision": 0.9558823529411765,
+  "recall": 0.975,
+  "f1_score": 0.9653465346534653,
+  "macro_f1_score": 0.9649964996499649,
+  "roc_auc": 0.996575,
+  "oob_score": null,
+  "confidence_reliability": [
+    {
+      "range": [
+        0.5,
+        0.6
+      ],
+      "images": 4,
+      "accuracy": 0.5
+    },
+    {
+      "range": [
+        0.6,
+        0.7
+      ],
+      "images": 11,
+      "accuracy": 0.5454545454545454
+    },
+    {
+      "range": [
+        0.7,
+        0.8
+      ],
+      "images": 7,
+      "accuracy": 0.7142857142857143
+    },
+    {
+      "range": [
+        0.8,
+        0.9
+      ],
+      "images": 10,
+      "accuracy": 0.9
+    },
+    {
+      "range": [
+        0.9,
+        1.0
+      ],
+      "images": 368,
+      "accuracy": 0.9891304347826086
+    }
+  ],
+  "confusion_matrix": {
+    "labels": [
+      "Early Blight",
+      "Late Blight"
+    ],
+    "matrix": [
+      [
+        191,
+        9
+      ],
+      [
+        5,
+        195
+      ]
+    ]
+  },
+  "classification_report": {
+    "per_class": {
+      "Early Blight": {
+        "precision": 0.9744897959183674,
+        "recall": 0.955,
+        "f1_score": 0.9646464646464646,
+        "support": 200
+      },
+      "Late Blight": {
+        "precision": 0.9558823529411765,
+        "recall": 0.975,
+        "f1_score": 0.9653465346534653,
+        "support": 200
+      }
+    },
+    "macro_avg": {
+      "precision": 0.965186074429772,
+      "recall": 0.965,
+      "f1_score": 0.9649964996499649,
+      "support": 400
+    },
+    "weighted_avg": {
+      "precision": 0.9651860744297719,
+      "recall": 0.965,
+      "f1_score": 0.964996499649965,
+      "support": 400
+    }
+  },
+  "classification_report_text": "              precision    recall  f1-score   support\n\nEarly Blight     0.9745    0.9550    0.9646       200\n Late Blight     0.9559    0.9750    0.9653       200\n\n    accuracy                         0.9650       400\n   macro avg     0.9652    0.9650    0.9650       400\nweighted avg     0.9652    0.9650    0.9650       400\n",
+  "by_source": {
+    "main_dataset": {
+      "images": 400,
+      "accuracy": 0.965,
+      "macro_f1_score": 0.9649964996499649,
+      "confusion_matrix": [
+        [
+          191,
+          9
+        ],
+        [
+          5,
+          195
+        ]
+      ]
+    }
+  },
+  "dataset": {
+    "total_images": 2000,
+    "class_distribution": {
+      "Early Blight": 1000,
+      "Late Blight": 1000
+    },
+    "source_distribution": {
+      "main_dataset": {
+        "Early Blight": 1000,
+        "Late Blight": 1000
+      }
+    },
+    "training_images": 1600,
+    "testing_images": 400,
+    "training_distribution": {
+      "Early Blight": 800,
+      "Late Blight": 800
+    },
+    "testing_distribution": {
+      "Early Blight": 200,
+      "Late Blight": 200
+    },
+    "rejected_files": 0,
+    "duplicate_groups": 0,
+    "images_in_duplicate_groups": 0,
+    "augmented_training_rows": 3200
+  },
+  "field_simulation": {
+    "accuracy": 0.9675,
+    "macro_f1_score": 0.967494921081419,
+    "images": 800,
+    "description": "2 simulated variations (zoomed crop, replaced background, lighting changes) of every held-out test image. A robustness indicator only."
+  },
+  "tuning": {
+    "method": "RandomizedSearchCV",
+    "candidates": 10,
+    "cv_folds": 3,
+    "cv_strategy": "StratifiedGroupKFold on the training split",
+    "scoring": "f1_macro",
+    "search_space": {
+      "n_estimators": [
+        200,
+        300,
+        400,
+        500
+      ],
+      "max_depth": [
+        12,
+        20,
+        30,
+        40
+      ],
+      "min_samples_split": [
+        2,
+        4,
+        8
+      ],
+      "min_samples_leaf": [
+        1,
+        2,
+        4
+      ],
+      "max_features": [
+        "sqrt",
+        "log2",
+        0.05
+      ]
+    },
+    "best_params": {
+      "n_estimators": 200,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": 0.05,
+      "max_depth": 20
+    },
+    "best_cv_f1_macro": 0.9745861389727898,
+    "best_cv_f1_macro_std": 0.006490601422639961,
+    "best_cv_train_f1_macro": 1.0
+  }
+}

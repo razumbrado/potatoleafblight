@@ -16,7 +16,8 @@ import { useScans } from '@/contexts/ScansContext';
 import { useSignedUrls } from '@/hooks/useSignedUrls';
 import { DISEASES, type ScanRecord } from '@/types';
 import { exportScansCsv } from '@/utils/csv';
-import { formatDate, formatDateTime, formatPercent, formatTime, getErrorMessage } from '@/utils/format';
+import { cn } from '@/utils/cn';
+import { describeScanModel, formatDate, formatDateTime, formatPercent, formatTime, getErrorMessage } from '@/utils/format';
 
 type SortKey = 'newest' | 'oldest' | 'confidence-desc' | 'confidence-asc' | 'disease';
 
@@ -39,6 +40,16 @@ function ConfidenceMeter({ value }: { value: number }) {
       </div>
       <span className="tabular text-sm font-semibold text-ink">{formatPercent(value)}</span>
     </div>
+  );
+}
+
+/** Which model produced the scan; legacy Teachable Machine rows are flagged so they are not read as Random Forest output. */
+function ModelTag({ scan }: { scan: ScanRecord }) {
+  const model = describeScanModel(scan);
+  return (
+    <p className={cn('mt-1.5 text-[11px] font-medium', model.legacy ? 'text-warning' : 'text-ink-faint')} title={model.label}>
+      {model.legacy ? 'Legacy model' : model.label}
+    </p>
   );
 }
 
@@ -72,7 +83,7 @@ export function HistoryPage() {
         if (fromMs !== null && time < fromMs) return false;
         if (toMs !== null && time > toMs) return false;
         if (!needle) return true;
-        const haystack = [scan.predicted_disease, formatDateTime(scan.scanned_at), formatPercent(scan.confidence), scan.id]
+        const haystack = [scan.predicted_disease, formatDateTime(scan.scanned_at), formatPercent(scan.confidence), scan.id, describeScanModel(scan).label]
           .join(' ')
           .toLowerCase();
         return haystack.includes(needle);
@@ -286,6 +297,7 @@ export function HistoryPage() {
                       </td>
                       <td className="px-4 py-3.5">
                         <DiseaseBadge disease={scan.predicted_disease} />
+                        <ModelTag scan={scan} />
                       </td>
                       <td className="px-4 py-3.5">
                         <ConfidenceMeter value={scan.confidence} />
@@ -324,6 +336,7 @@ export function HistoryPage() {
                     <ScanThumb url={urls[scan.image_path]} loading={urlsLoading} alt={`${scan.predicted_disease} scan`} className="h-20 w-20 rounded-2xl" />
                     <div className="min-w-0 flex-1">
                       <DiseaseBadge disease={scan.predicted_disease} />
+                      <ModelTag scan={scan} />
                       <p className="tabular mt-2 text-lg font-extrabold text-ink">{formatPercent(scan.confidence)}</p>
                       <p className="text-xs text-ink-faint">{formatDateTime(scan.scanned_at)}</p>
                     </div>
