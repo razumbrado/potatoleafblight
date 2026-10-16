@@ -99,16 +99,19 @@ export function ResultsPage() {
         eyebrow="Classification report"
         title="Classification Result"
         description="Probabilities below are the direct predict_proba() outputs of the trained Random Forest for this image."
+        actionsClassName="w-full flex-nowrap sm:w-auto"
         actions={
           <>
-            <Button variant="outline" onClick={handleAnother} icon={<ScanLine className="h-4 w-4" />}>
-              Analyze Another Image
+            <Button variant="outline" onClick={handleAnother} icon={<ScanLine className="h-4 w-4" />} className="flex-1 px-3 sm:flex-none sm:px-5">
+              <span className="sm:hidden">Analyze New</span>
+              <span className="hidden sm:inline">Analyze Another Image</span>
             </Button>
             <Button
               onClick={() => void handleSave()}
               loading={saving}
               disabled={Boolean(savedScanId)}
               icon={savedScanId ? <CheckCircle2 className="h-4 w-4" /> : <CloudUpload className="h-4 w-4" />}
+              className="flex-1 px-3 sm:flex-none sm:px-5"
               data-testid="save-button"
             >
               {savedScanId ? 'Saved' : saving ? 'Saving…' : 'Save Result'}
