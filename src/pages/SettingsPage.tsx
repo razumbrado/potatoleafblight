@@ -55,7 +55,7 @@ function ProfileCard() {
     <Card>
       <CardHeader title="User profile" description="How your name appears across BlightVision." icon={<User />} />
       <div className="mb-6 flex items-center gap-4 rounded-2xl bg-surface-alt p-4">
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-forest text-lg font-extrabold text-soft">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-pine-100 text-lg font-extrabold text-pine-700 dark:bg-subtle dark:text-pine-300">
           {getInitials(displayName)}
         </span>
         <div className="min-w-0">

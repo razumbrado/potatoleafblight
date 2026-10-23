@@ -3,7 +3,6 @@ import {
   BarChart3,
   BrainCircuit,
   Crosshair,
-  Database,
   Grid2x2,
   Layers,
   RefreshCw,
@@ -24,7 +23,6 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { API_BASE_URL } from '@/lib/constants';
 import { ApiError, api } from '@/services/api';
 import type { ClassMetrics, ModelEvaluation, ModelInfo } from '@/types';
 import { cn } from '@/utils/cn';
@@ -36,18 +34,6 @@ type LoadState =
   | { kind: 'untrained'; message: string }
   | { kind: 'error'; message: string };
 
-const HYPERPARAMETER_LABELS: Record<string, string> = {
-  n_estimators: 'Number of trees',
-  max_depth: 'Max depth',
-  min_samples_split: 'Min samples to split',
-  min_samples_leaf: 'Min samples per leaf',
-  max_features: 'Max features per split',
-  class_weight: 'Class weight',
-  bootstrap: 'Bootstrap sampling',
-  criterion: 'Split criterion',
-  random_state: 'Random state',
-};
-
 const SOURCE_LABELS: Record<string, string> = {
   main_dataset: 'Main dataset',
   PlantVillage: 'Main dataset (single leaf, plain background)',
@@ -55,16 +41,14 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 const sourceLabel = (source: string) => SOURCE_LABELS[source] ?? source.replace(/_/g, ' ');
 
-const formatParam =(value: string | number | boolean | null) => (value === null ? 'None (unlimited)' : String(value));
-
 function MetricCard({ label, value, caption, icon }: { label: string; value: number; caption: string; icon: ReactNode }) {
   return (
     <Card interactive className="flex flex-col">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-semibold text-ink-muted">{label}</p>
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
+        <p className="text-sm font-semibold text-pine-800/70 dark:text-ink-muted">{label}</p>
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300 [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
       </div>
-      <p className="tabular mt-2 text-3xl font-extrabold text-ink sm:text-4xl" data-testid={`metric-${label.toLowerCase().replace(/\s+/g, '-')}`}>
+      <p className="tabular mt-2 text-3xl font-extrabold tracking-[-0.02em] text-pine-900 sm:text-4xl dark:text-ink" data-testid={`metric-${label.toLowerCase().replace(/\s+/g, '-')}`}>
         {formatPercent(value)}
       </p>
       <p className="mt-1.5 text-xs text-ink-faint">{caption}</p>
@@ -209,17 +193,14 @@ function EvaluationContent({ evaluation, info }: { evaluation: ModelEvaluation; 
         <MetricCard label="Testing Accuracy" value={evaluation.testing_accuracy} caption={testCaption} icon={<Target />} />
         <MetricCard label="Precision" value={evaluation.precision} caption={`Positive class: ${positive}`} icon={<Crosshair />} />
         <MetricCard label="Recall" value={evaluation.recall} caption={`Positive class: ${positive}`} icon={<Scale />} />
-        <MetricCard label="F1-Score" value={evaluation.f1_score} caption={`Positive class: ${positive} · macro ${formatPercent(evaluation.macro_f1_score)}`} icon={<Sigma />} />
+        <MetricCard label="F1-Score" value={evaluation.f1_score} caption={`Positive class: ${positive}`} icon={<Sigma />} />
       </div>
 
       <Notice tone="info" title="Reading these numbers">
-        Precision, recall, and F1 treat <strong>{positive}</strong> as the positive class; per-class and macro-averaged values are in
+        Precision, recall, and F1 treat <strong>{positive}</strong> as the positive class; per-class values are in
         the classification report below. Random Forests usually fit their own training images almost perfectly, so the
         {overfitGap > 0 ? ` ${formatPercent(overfitGap)} gap between training and testing accuracy` : ' training accuracy'} is
-        expected — the testing accuracy
-        {evaluation.tuning ? `, the cross-validated F1 (${formatPercent(evaluation.tuning.best_cv_f1_macro)})` : ''}
-        {evaluation.oob_score !== null ? ` and the out-of-bag score (${formatPercent(evaluation.oob_score)})` : ''} are the better
-        guides to performance on new photos. These are results on this dataset, not a guarantee for any individual image.
+        expected. These are results on this dataset, not a guarantee for any individual image.
       </Notice>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
@@ -228,12 +209,12 @@ function EvaluationContent({ evaluation, info }: { evaluation: ModelEvaluation; 
           <ConfusionMatrix labels={cm.labels} matrix={cm.matrix} />
         </Card>
 
-        <Card padded={false} className="min-w-0 overflow-hidden">
+        <Card padded={false} className="flex min-w-0 flex-col overflow-hidden">
           <div className="p-5 pb-0 sm:p-6 sm:pb-0">
             <CardHeader title="Classification Report" description={`scikit-learn classification_report · ${testCaption.toLowerCase()}`} icon={<Table2 />} />
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[520px] text-left">
+          <div className="flex-1 overflow-x-auto">
+            <table className="h-full w-full min-w-[520px] text-left">
               <thead>
                 <tr className="border-y border-line bg-surface-alt text-xs font-semibold uppercase tracking-wider text-ink-faint">
                   <th scope="col" className="px-4 py-3 sm:px-6">Disease class</th>
@@ -247,71 +228,11 @@ function EvaluationContent({ evaluation, info }: { evaluation: ModelEvaluation; 
                 {evaluation.classes.map((name) => (
                   <ReportRow key={name} name={name} metrics={report.per_class[name]} />
                 ))}
-                <ReportRow name="Macro average" metrics={report.macro_avg} emphasis />
-                <ReportRow name="Weighted average" metrics={report.weighted_avg} emphasis />
               </tbody>
             </table>
           </div>
-          <p className="border-t border-line px-4 py-3.5 text-sm text-ink-muted sm:px-6">
-            Overall test accuracy <span className="tabular font-bold text-ink">{formatPercent(evaluation.testing_accuracy)}</span>
-            {evaluation.roc_auc !== null && (
-              <>
-                {' '}· ROC-AUC <span className="tabular font-bold text-ink">{evaluation.roc_auc.toFixed(4)}</span>
-              </>
-            )}
-          </p>
-          {evaluation.field_simulation && (
-            <p className="border-t border-line px-4 py-3.5 text-sm text-ink-muted sm:px-6" data-testid="field-simulation">
-              Field-style stress test{' '}
-              <span className="tabular font-bold text-ink">{formatPercent(evaluation.field_simulation.accuracy)}</span> accuracy on{' '}
-              {evaluation.field_simulation.images.toLocaleString()} simulated images
-              <span className="mt-1 block text-xs text-ink-faint">{evaluation.field_simulation.description}</span>
-            </p>
-          )}
         </Card>
       </div>
-
-      {evaluation.confidence_reliability && (
-        <Card padded={false} className="min-w-0 overflow-hidden">
-          <div className="p-5 pb-0 sm:p-6 sm:pb-0">
-            <CardHeader
-              title="Confidence Reliability"
-              description={`How often the model was actually right at each confidence level · ${testCaption.toLowerCase()}`}
-              icon={<Target />}
-            />
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px] text-left">
-              <thead>
-                <tr className="border-y border-line bg-surface-alt text-xs font-semibold uppercase tracking-wider text-ink-faint">
-                  <th scope="col" className="px-4 py-3 sm:px-6">Reported confidence</th>
-                  <th scope="col" className="px-4 py-3">Test images</th>
-                  <th scope="col" className="px-4 py-3 pr-4 text-right sm:pr-6">Actually correct</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {evaluation.confidence_reliability.map((bin) => (
-                  <tr key={bin.range[0]} className="transition-colors hover:bg-surface-alt">
-                    <th scope="row" className="tabular px-4 py-3 text-sm font-semibold text-ink sm:px-6">
-                      {Math.round(bin.range[0] * 100)}–{Math.round(bin.range[1] * 100)}%
-                    </th>
-                    <td className="tabular px-4 py-3 text-sm text-ink">{bin.images.toLocaleString()}</td>
-                    <td className="tabular px-4 py-3 pr-4 text-right text-sm font-semibold text-ink sm:pr-6">
-                      {bin.accuracy === null ? '—' : formatPercent(bin.accuracy)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="border-t border-line px-4 py-3.5 text-xs leading-relaxed text-ink-faint sm:px-6">
-            {info.probability_calibration
-              ? `Confidence values are Random Forest probabilities calibrated with ${info.probability_calibration.method}, fitted on the training split only, so that they track how often predictions are correct. `
-              : 'Confidence values are the share of decision trees voting for the predicted class. '}
-            Photos that look unlike the training images usually receive lower confidence.
-          </p>
-        </Card>
-      )}
 
       {evaluation.by_source && Object.keys(evaluation.by_source).length > 1 && (
         <Card className="min-w-0">
@@ -391,51 +312,6 @@ function EvaluationContent({ evaluation, info }: { evaluation: ModelEvaluation; 
           </dl>
         </Card>
       </div>
-
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Card className="min-w-0">
-          <CardHeader title="Hyperparameters" description={info.tuned ? 'Selected by cross-validation on the training split only' : 'Default configuration (no tuning run)'} icon={<Layers />} />
-          <dl className="grid gap-3 sm:grid-cols-2">
-            {Object.entries(info.hyperparameters).map(([key, value]) => (
-              <div key={key} className="rounded-xl bg-subtle p-3">
-                <dt className="text-xs font-semibold text-ink-faint">{HYPERPARAMETER_LABELS[key] ?? key}</dt>
-                <dd className="mt-0.5 font-mono text-sm font-semibold text-ink">{formatParam(value)}</dd>
-              </div>
-            ))}
-          </dl>
-          {evaluation.tuning && (
-            <p className="mt-4 text-xs leading-relaxed text-ink-faint">
-              {evaluation.tuning.method}: {evaluation.tuning.candidates} candidates × {evaluation.tuning.cv_folds}-fold {evaluation.tuning.cv_strategy}. Best mean
-              macro F1 {formatPercent(evaluation.tuning.best_cv_f1_macro)} ± {formatPercent(evaluation.tuning.best_cv_f1_macro_std)}. The test split was not
-              used for tuning.
-            </p>
-          )}
-        </Card>
-
-        <Card className="min-w-0">
-          <CardHeader title="Feature Extraction" description={`Each image is converted to ${info.feature_count.toLocaleString()} numbers; the Random Forest classifies those numbers`} icon={<Database />} />
-          <ul className="space-y-2.5">
-            {info.feature_extraction.map((method) => (
-              <li key={method} className="flex gap-2.5 text-sm leading-relaxed text-ink-muted">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-soft" aria-hidden />
-                {method}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {Object.entries(info.feature_layout).map(([key, count]) => (
-              <span key={key} className="rounded-full bg-subtle px-3 py-1 text-xs font-semibold text-ink-muted">
-                {key.replace(/_/g, ' ')}: <span className="tabular text-ink">{count.toLocaleString()}</span>
-              </span>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <p className="text-xs text-ink-faint">
-        Source: <span className="font-mono">{API_BASE_URL}/api/model/evaluation</span> · evaluated {formatDateTime(evaluation.generated_at)} · model{' '}
-        <span className="font-mono">{evaluation.model_version}</span>
-      </p>
     </div>
   );
 }

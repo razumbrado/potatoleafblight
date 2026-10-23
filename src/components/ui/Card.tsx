@@ -13,7 +13,7 @@ export function Card({ interactive, padded = true, className, ...props }: CardPr
       className={cn(
         'card print-surface',
         padded && 'p-5 sm:p-6',
-        interactive && 'transition-all duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-lift',
+        interactive && 'transition-all duration-300 hover:-translate-y-0.5 hover:border-pine-300/60 hover:shadow-lift dark:hover:border-line-strong',
         className,
       )}
       {...props}
@@ -34,13 +34,13 @@ export function CardHeader({ title, description, icon, action, className }: Card
     <div className={cn('mb-5 flex flex-wrap items-start justify-between gap-3', className)}>
       <div className="flex min-w-0 items-start gap-3">
         {icon && (
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent [&>svg]:h-5 [&>svg]:w-5">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300 [&>svg]:h-5 [&>svg]:w-5">
             {icon}
           </span>
         )}
         <div className="min-w-0">
-          <h3 className="text-base font-bold text-ink">{title}</h3>
-          {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
+          <h3 className="text-base font-bold text-pine-900 dark:text-ink">{title}</h3>
+          {description && <p className="mt-0.5 text-sm text-pine-800/70 dark:text-ink-muted">{description}</p>}
         </div>
       </div>
       {action}

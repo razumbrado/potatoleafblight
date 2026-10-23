@@ -1,6 +1,7 @@
 import { useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, FolderOpen, UploadCloud } from 'lucide-react';
+import { pillPrimary, pillSecondary } from '@/components/ios/Ios';
 import { Button } from '@/components/ui/Button';
 import { ACCEPTED_EXTENSIONS, ACCEPTED_MIME_TYPES } from '@/lib/constants';
 import { cn } from '@/utils/cn';
@@ -69,11 +70,13 @@ export function UploadZone({ onFile, onOpenCamera, onReject }: UploadZoneProps) 
         if (dragDepth.current === 0) setDragging(false);
       }}
       onDrop={handleDrop}
-      animate={{ scale: dragging ? 1.012 : 1 }}
+      animate={{ scale: dragging ? 1.01 : 1 }}
       transition={{ type: 'spring', stiffness: 320, damping: 24 }}
       className={cn(
-        'leaf-pattern relative flex min-h-[380px] flex-col items-center justify-center rounded-3xl border-2 border-dashed px-6 py-12 text-center transition-colors duration-200',
-        dragging ? 'border-accent bg-accent-soft' : 'border-soft/70 bg-accent-soft/40 hover:border-accent/70 dark:border-line-strong',
+        'relative flex min-h-[220px] flex-1 flex-col items-center justify-center overflow-hidden rounded-[20px] border-2 border-dashed px-6 py-6 text-center transition-colors duration-200',
+        dragging
+          ? 'border-pine-700 bg-pine-100'
+          : 'border-pine-300/60 bg-[#F5FBF6] hover:border-pine-700/50 hover:bg-pine-100/50 dark:border-line-strong dark:bg-subtle',
       )}
     >
       <input
@@ -94,25 +97,25 @@ export function UploadZone({ onFile, onOpenCamera, onReject }: UploadZoneProps) 
       <motion.div
         animate={{ y: dragging ? -6 : 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-        className="flex h-20 w-20 items-center justify-center rounded-3xl bg-surface text-accent shadow-card ring-1 ring-line"
+        className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-white text-pine-700 shadow-[0_6px_18px_-8px_rgb(11_43_38/0.3)] ring-1 ring-pine-100 dark:bg-surface dark:text-pine-300 dark:ring-line"
       >
-        <UploadCloud className="h-9 w-9" aria-hidden />
+        <UploadCloud className="h-7 w-7" aria-hidden />
       </motion.div>
 
-      <h2 className="mt-6 text-xl font-extrabold text-ink sm:text-2xl">
+      <h2 className="mt-3 text-xl font-extrabold tracking-[-0.01em] text-pine-900 sm:text-[22px] dark:text-ink">
         {dragging ? 'Drop the image to upload' : touchDevice ? 'Upload a potato leaf image' : 'Drag & drop a potato leaf image'}
       </h2>
-      <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
+      <p className="mt-2 max-w-sm text-[15px] leading-relaxed text-ink-muted">
         {touchDevice
           ? 'Choose a photo from your gallery or take one with the camera. JPG, JPEG, PNG, or WEBP — up to 10 MB.'
           : 'or choose a photo from your device. JPG, JPEG, PNG, or WEBP — up to 10 MB.'}
       </p>
 
-      <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-        <Button onClick={browse} icon={<FolderOpen className="h-4 w-4" />}>
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+        <Button onClick={browse} icon={<FolderOpen className="h-4 w-4" />} className={cn(pillPrimary, 'px-6')}>
           Browse Image
         </Button>
-        <Button variant="outline" onClick={onOpenCamera} icon={<Camera className="h-4 w-4" />}>
+        <Button variant="outline" onClick={onOpenCamera} icon={<Camera className="h-4 w-4" />} className={cn(pillSecondary, 'px-6')}>
           Use Camera
         </Button>
       </div>

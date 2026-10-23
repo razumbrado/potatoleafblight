@@ -24,6 +24,8 @@ export default {
         mint: '#D8F3DC',
         pale: '#F1F8F3',
         warm: '#FAFCF9',
+        // Content-page palette (dark → light)
+        pine: { 950: '#051F20', 900: '#0B2B26', 800: '#163832', 700: '#235347', 300: '#8EB69B', 100: '#DAF1DE' },
         // Theme-aware semantic tokens (see src/styles/index.css)
         canvas: token('canvas'),
         surface: { DEFAULT: token('surface'), alt: token('surface-alt') },

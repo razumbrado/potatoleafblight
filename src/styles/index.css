@@ -59,6 +59,19 @@
     color-scheme: dark;
   }
 
+  /* Button shape and primary colour. Landing and sign-in pages keep these defaults;
+     the app pages (body.app-theme, set by AppLayout) get pill buttons in #235347. */
+  :root {
+    --btn-radius: 0.875rem;
+    --btn-primary: 45 106 79;
+    --btn-primary-hover: 37 90 67;
+  }
+  .app-theme {
+    --btn-radius: 9999px;
+    --btn-primary: 35 83 71;
+    --btn-primary-hover: 22 56 50;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -112,7 +125,7 @@
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-line bg-surface shadow-card;
+    @apply rounded-[22px] border border-pine-100 bg-surface shadow-[0_1px_2px_rgb(11_43_38/0.04),0_12px_28px_-18px_rgb(11_43_38/0.25)] dark:border-line;
   }
 
   .eyebrow {

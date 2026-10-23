@@ -33,7 +33,7 @@ function InfoList({ title, icon, items }: { title: string; icon: ReactNode; item
   return (
     <Card className="h-full">
       <div className="mb-4 flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent [&>svg]:h-5 [&>svg]:w-5">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300 [&>svg]:h-5 [&>svg]:w-5">
           {icon}
         </span>
         <h3 className="text-base font-bold text-ink">{title}</h3>
@@ -175,7 +175,7 @@ export function ResultReport({
 
       <Card>
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300">
             <Sprout className="h-5 w-5" aria-hidden />
           </span>
           <h3 className="text-base font-bold text-ink">About {predictedDisease}</h3>

@@ -1,13 +1,13 @@
 import { useEffect, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bug, Camera, CloudSun, Eye, GraduationCap, ListChecks, Microscope, ScanLine, ShieldCheck, Stethoscope } from 'lucide-react';
+import { Bug, CloudSun, Eye, GraduationCap, ListChecks, Microscope, ScanLine, ShieldCheck, Stethoscope } from 'lucide-react';
 import { Notice } from '@/components/common/Notice';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Reveal } from '@/components/common/PageTransition';
 import { Badge } from '@/components/ui/Badge';
 import { buttonStyles } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { CAPTURE_TIPS, COMPARISON_ROWS, DISEASE_LIST, FARMER_NOTES, type DiseaseInfo } from '@/lib/diseases';
+import { COMPARISON_ROWS, DISEASE_LIST, FARMER_NOTES, type DiseaseInfo } from '@/lib/diseases';
 import { cn } from '@/utils/cn';
 
 function DetailBlock({ icon, title, items }: { icon: ReactNode; title: string; items: string[] }) {
@@ -37,8 +37,7 @@ function DiseaseProfile({ disease }: { disease: DiseaseInfo }) {
         <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <figure className="relative min-h-[260px] lg:min-h-full">
             <img src={disease.image.src} alt={disease.image.alt} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest/70 via-transparent to-transparent" aria-hidden />
-            <figcaption className="absolute inset-x-4 bottom-3 text-[11px] text-white/80">{disease.image.credit}</figcaption>
+                        <figcaption className="absolute bottom-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] text-white/90">{disease.image.credit}</figcaption>
           </figure>
           <div className="p-6 sm:p-8">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -183,35 +182,11 @@ export function DiseasesPage() {
         ))}
       </div>
 
-      {/* Capture tips */}
-      <section id="capture-tips" className="mt-8 scroll-mt-24">
-        <Card>
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent">
-              <Camera className="h-5 w-5" aria-hidden />
-            </span>
-            <div>
-              <h2 className="text-xl font-extrabold text-ink">Image capture tips</h2>
-              <p className="text-sm text-ink-muted">Better photos give the model a fairer chance.</p>
-            </div>
-          </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {CAPTURE_TIPS.map((tip, index) => (
-              <div key={tip.title} className="rounded-2xl border border-line bg-surface-alt p-5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-forest text-sm font-bold text-soft">{index + 1}</span>
-                <h3 className="mt-3.5 text-sm font-bold text-ink">{tip.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{tip.body}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </section>
-
       {/* Farmer education */}
       <section className="mt-8">
         <Card>
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300">
               <GraduationCap className="h-5 w-5" aria-hidden />
             </span>
             <div>

@@ -131,7 +131,7 @@ export function ResultsPage() {
         modelLabel={`${result.modelName} · ${result.modelVersion}`}
       />
 
-      <div className="no-print mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4">
+      <div className="card no-print mt-6 flex flex-wrap items-center justify-between gap-3 p-4 sm:px-5">
         <p className="text-sm text-ink-muted">
           {savedScanId ? 'This result is stored in your private scan history.' : 'Unsaved results are cleared when you leave or refresh the app.'}
         </p>

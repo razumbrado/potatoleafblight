@@ -18,7 +18,6 @@ const columns = [
     links: [
       { to: '/diseases', label: 'Disease Library' },
       { to: '/about', label: 'About the System' },
-      { to: '/diseases#capture-tips', label: 'Image Capture Tips' },
     ],
   },
   {

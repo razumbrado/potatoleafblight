@@ -39,7 +39,7 @@ export function AnalyticsPage() {
         title="Analytics Dashboard"
         description="Calculated live from the scans saved in your Supabase history."
         actions={
-          <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1" role="group" aria-label="Date range">
+          <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-pine-100 bg-surface p-1 shadow-sm dark:border-line" role="group" aria-label="Date range">
             <CalendarRange className="ml-2 mr-1 hidden h-4 w-4 shrink-0 text-ink-faint sm:block" aria-hidden />
             {RANGE_OPTIONS.map((option) => (
               <button
@@ -48,8 +48,8 @@ export function AnalyticsPage() {
                 onClick={() => setRange(option.key)}
                 aria-pressed={range === option.key}
                 className={cn(
-                  'h-9 shrink-0 rounded-lg px-3 text-sm font-semibold transition-colors',
-                  range === option.key ? 'bg-primary text-white shadow-sm' : 'text-ink-muted hover:bg-subtle hover:text-ink',
+                  'h-9 shrink-0 rounded-full px-3.5 text-sm font-semibold transition-colors',
+                  range === option.key ? 'bg-pine-700 text-white shadow-sm' : 'text-ink-muted hover:bg-pine-100/60 hover:text-pine-900 dark:hover:bg-subtle dark:hover:text-ink',
                 )}
               >
                 {option.label}

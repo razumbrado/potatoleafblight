@@ -1,21 +1,18 @@
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
-import { AlertTriangle, BrainCircuit, Crop, Cpu, Database, GraduationCap, Layers, Lock, Microscope, Sprout, Target, Tractor, Users } from 'lucide-react';
+import { AlertTriangle, Database, GraduationCap, Lock, Microscope, Sprout, Target, Tractor, Users } from 'lucide-react';
 import { Notice } from '@/components/common/Notice';
 import { LogoMark } from '@/components/common/Logo';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Reveal } from '@/components/common/PageTransition';
 import { Card } from '@/components/ui/Card';
-import { useModel } from '@/contexts/ModelContext';
 import { MODEL_DISCLAIMER } from '@/lib/constants';
-import { DISEASE_LIST } from '@/lib/diseases';
 
 function Section({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
     <Reveal>
       <Card className="h-full">
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent [&>svg]:h-5 [&>svg]:w-5">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300 [&>svg]:h-5 [&>svg]:w-5">
             {icon}
           </span>
           <h2 className="text-lg font-extrabold text-ink">{title}</h2>
@@ -39,13 +36,6 @@ function Bullets({ items }: { items: ReactNode[] }) {
   );
 }
 
-const pipeline = [
-  { icon: Crop, title: 'Prepare', text: 'The Python backend converts your image to RGB and resizes it to a fixed square size.' },
-  { icon: Layers, title: 'Extract', text: 'A frozen, ImageNet-pretrained CNN plus colour, HOG, texture, and lesion descriptors turn the image into one numeric feature vector.' },
-  { icon: BrainCircuit, title: 'Classify', text: 'Hundreds of decision trees in a trained Random Forest each vote on the class.' },
-  { icon: Target, title: 'Report', text: 'predict_proba() averages the trees’ votes into probabilities that add up to 100%.' },
-];
-
 const users = [
   { icon: Tractor, title: 'Farmers and growers', text: 'A quick first look at suspicious leaves before seeking advice.' },
   { icon: Users, title: 'Extension workers', text: 'A conversation aid when visiting fields and recording observations.' },
@@ -54,8 +44,6 @@ const users = [
 ];
 
 export function AboutPage() {
-  const { info } = useModel();
-
   return (
     <div>
       <PageHeader
@@ -106,80 +94,7 @@ export function AboutPage() {
       <Reveal className="mt-5">
         <Card>
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-              <Cpu className="h-5 w-5" aria-hidden />
-            </span>
-            <h2 className="text-lg font-extrabold text-ink">How image classification works</h2>
-          </div>
-          <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {pipeline.map((step, index) => (
-              <li key={step.title} className="relative rounded-2xl border border-line bg-surface-alt p-5">
-                <span className="absolute right-4 top-4 text-3xl font-extrabold text-line-strong">{index + 1}</span>
-                <step.icon className="h-6 w-6 text-accent" aria-hidden />
-                <h3 className="mt-3 text-sm font-bold text-ink">{step.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{step.text}</p>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-5 text-sm leading-relaxed text-ink-muted">
-            Because the probabilities are the share of tree votes for each of two classes, they always sum to 100%. A
-            high percentage means most trees found the image closer to that class — it is not a guarantee that the
-            prediction is correct, nor a measure of how likely the plant is to have the disease.
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            See how the model performed on held-out test images on the{' '}
-            <Link to="/model-evaluation" className="font-semibold text-accent hover:underline">
-              Model Evaluation
-            </Link>{' '}
-            page.
-          </p>
-        </Card>
-      </Reveal>
-
-      <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Section icon={<BrainCircuit />} title="Random Forest integration">
-          <p>
-            The classifier is a scikit-learn <code className="font-semibold text-ink">RandomForestClassifier</code> trained by{' '}
-            <code className="font-semibold text-ink">backend/train_model.py</code> on labelled potato leaf images and saved with
-            Joblib. The FastAPI backend loads the saved model once and calls{' '}
-            <code className="font-semibold text-ink">predict_proba()</code> on the features extracted from your image — the model is
-            never retrained when you analyze a photo.
-          </p>
-          <dl className="grid grid-cols-2 gap-3 pt-1">
-            {[
-              ['Framework', 'scikit-learn'],
-              ['Decision trees', info ? info.n_estimators.toLocaleString() : '—'],
-              ['Features per image', info ? info.feature_count.toLocaleString() : '—'],
-              ['Runs on', 'Python FastAPI server'],
-            ].map(([term, detail]) => (
-              <div key={term} className="rounded-xl bg-subtle p-3">
-                <dt className="text-xs font-semibold text-ink-faint">{term}</dt>
-                <dd className="mt-0.5 font-semibold text-ink">{detail}</dd>
-              </div>
-            ))}
-          </dl>
-        </Section>
-
-        <Section icon={<Layers />} title="Supported disease classes">
-          <ul className="space-y-3">
-            {DISEASE_LIST.map((disease) => (
-              <li key={disease.slug} className="rounded-xl border border-line bg-surface-alt p-4">
-                <p className="font-bold text-ink">{disease.name}</p>
-                <p className="text-xs italic text-ink-faint">
-                  {disease.agent} · <span className="not-italic">{disease.agentType}</span>
-                </p>
-                <p className="mt-1.5">{disease.tagline}</p>
-              </li>
-            ))}
-          </ul>
-          <p>These are the only two outputs the model can produce.</p>
-        </Section>
-      </div>
-
-      <Reveal className="mt-5">
-        <Card>
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-pine-100 text-pine-700 dark:bg-subtle dark:text-pine-300">
               <Users className="h-5 w-5" aria-hidden />
             </span>
             <h2 className="text-lg font-extrabold text-ink">Intended users</h2>

@@ -152,15 +152,6 @@ export const COMPARISON_ROWS: { feature: string; early: string; late: string }[]
   { feature: 'Tuber involvement', early: 'Possible; dry, sunken lesions', late: 'Common; firm reddish-brown rot' },
 ];
 
-export const CAPTURE_TIPS: { title: string; body: string }[] = [
-  { title: 'One leaf, filling the frame', body: 'Photograph a single potato leaf or leaflet so the affected area takes up most of the picture.' },
-  { title: 'Use even daylight', body: 'Shoot in bright shade or on an overcast day. Avoid harsh sun, deep shadows, and flash glare.' },
-  { title: 'Keep it sharp', body: 'Hold the phone steady, tap to focus on the lesion, and retake the photo if it looks blurry.' },
-  { title: 'Plain background', body: 'Lay a single picked leaf flat on a plain, neutral surface such as grey card or paper. In testing, this model was far less reliable on in-field photos with other foliage behind the leaf.' },
-  { title: 'Show the symptoms', body: 'Capture the upper leaf surface with the spots clearly visible; a second photo of the underside can help an expert.' },
-  { title: 'Potato leaves only', body: 'The model was trained on potato leaves with early or late blight. Other subjects still get a prediction, but it will not be meaningful.' },
-];
-
 export const FARMER_NOTES: { title: string; body: string }[] = [
   {
     title: 'Scout early and often',

@@ -25,6 +25,12 @@ export function AppLayout() {
     ensureLoaded();
   }, [ensureLoaded]);
 
+  // App pages get pill buttons in the content palette; set on <body> so dialogs pick it up too.
+  useEffect(() => {
+    document.body.classList.add('app-theme');
+    return () => document.body.classList.remove('app-theme');
+  }, []);
+
   useEffect(() => {
     setDrawerOpen(false);
     window.scrollTo({ top: 0 });

@@ -6,11 +6,11 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'dan
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const base =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold transition-all duration-200 select-none ' +
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--btn-radius)] font-semibold transition-all duration-200 select-none ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50';
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-white shadow-sm hover:bg-primary-hover hover:shadow-glow',
+  primary: 'bg-[rgb(var(--btn-primary))] text-white shadow-sm hover:bg-[rgb(var(--btn-primary-hover))] hover:shadow-glow',
   secondary: 'bg-accent-soft text-accent hover:brightness-95 dark:hover:brightness-125',
   outline: 'border border-line-strong bg-surface text-ink hover:border-accent hover:bg-subtle',
   ghost: 'text-ink-muted hover:bg-subtle hover:text-ink',

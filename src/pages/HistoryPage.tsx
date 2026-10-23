@@ -149,8 +149,7 @@ export function HistoryPage() {
     toast.success(`Exported ${filtered.length} ${filtered.length === 1 ? 'scan' : 'scans'} to CSV.`);
   };
 
-  const showSkeleton = loading && scans.length === 0;
-  const firstRow = filtered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const showSkeleton = loading && scans.length === 0;  const firstRow = filtered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const lastRow = Math.min(currentPage * pageSize, filtered.length);
 
   return (
@@ -192,8 +191,9 @@ export function HistoryPage() {
         </Notice>
       )}
 
+      <Card padded={false} className="overflow-hidden">
       {/* Filters */}
-      <Card className="mb-5 p-4 sm:p-5">
+      <div className="border-b border-pine-100 bg-pine-100/25 p-4 sm:p-5 dark:border-line dark:bg-surface-alt">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))]">
           <Input
             label="Search"
@@ -233,9 +233,8 @@ export function HistoryPage() {
             </Button>
           </div>
         )}
-      </Card>
+      </div>
 
-      <Card padded={false} className="overflow-hidden">
         {showSkeleton ? (
           <div className="divide-y divide-line" role="status" aria-label="Loading scan history">
             {Array.from({ length: 6 }).map((_, index) => (
